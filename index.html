@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>实资办业务架构展示平台 V4 Lite</title>
+<style>
+:root{--blue:#205fbd;--nav:#123765;--bg:#f5f7fb;--line:#dce4ef;--text:#172033;--muted:#748096;--green:#11956f;--purple:#7446c8;--red:#d92d20}
+*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--text)}button,input,textarea{font:inherit}button{cursor:pointer}
+.top{height:66px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px}.brand{font-size:19px;font-weight:800;color:#173f78}.topright{display:flex;gap:9px;align-items:center}.btn{border:0;border-radius:8px;padding:9px 14px}.primary{background:var(--blue);color:#fff}.ghost{background:#fff;border:1px solid #d7dfeb}.danger{background:#fff1f2;color:var(--red);border:1px solid #fecaca}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 66px)}aside{background:var(--nav);color:#dce8f8;padding:15px 10px}.menu{padding:11px 13px;border-radius:8px;margin:3px 0;cursor:pointer}.menu.active,.menu:hover{background:#ffffff18;color:#fff}.main{padding:22px;min-width:0}.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.head h2{margin:0}.sub{font-size:13px;color:var(--muted);margin-top:5px}.toolbar{display:flex;gap:8px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}.status{display:inline-flex;gap:6px;align-items:center;background:#ecfdf3;color:#067647;padding:5px 9px;border-radius:20px;font-size:12px}.dot{width:7px;height:7px;border-radius:50%;background:#12b76a}
+.graph{height:650px;overflow:auto;background-image:radial-gradient(#d3dce9 1px,transparent 1px);background-size:22px 22px;border-radius:11px;position:relative}.stage{width:1500px;height:620px;position:relative}svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.edge{fill:none;stroke:#b5c2d5;stroke-width:2}.edge.platform{stroke-dasharray:5 5}
+.node{position:absolute;width:215px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 7px 22px #243b6016;z-index:2}.node.root{background:linear-gradient(135deg,#17477f,#2868b9);color:#fff}.node.business{border-top:4px solid var(--blue)}.node.position{border-top:4px solid var(--green)}.node.platform{border-top:4px solid var(--purple)}.position-inline{margin-top:10px;padding-top:9px;border-top:1px solid #edf1f6;display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap}.position-inline .label{font-size:10px;color:#667085;padding-top:3px}.position-chip{display:inline-block;padding:3px 8px;border-radius:20px;background:#ecfdf3;color:#087a5a;font-size:11px;font-weight:700}.nodebody{padding:13px}.type{font-size:11px;color:#8994a7;margin-bottom:5px}.root .type{color:#d7e6fb}.name{font-weight:700}.desc{font-size:11px;color:#707b8f;margin-top:7px;line-height:1.5}.root .desc{color:#dbe8fa}.node.editable{cursor:grab}.node.editable:active{cursor:grabbing}.node.selected{outline:3px solid #a7c3ff}.tip{display:none;position:fixed;right:28px;top:28px;left:auto!important;width:320px;max-height:calc(100vh - 56px);overflow:auto;background:#172033;color:#fff;border-radius:10px;padding:14px;z-index:2147483647;font-size:12px;line-height:1.7;box-shadow:0 15px 35px #0004;pointer-events:none}.business:hover .tip{display:block}.tip b{color:#b8d2ff}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:17px}.card b{font-size:25px}.card span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.drawerbg{display:none;position:fixed;inset:0;background:#10182844;z-index:50}.drawer{position:absolute;right:0;top:0;height:100%;width:410px;background:#fff;padding:22px;overflow:auto;box-shadow:-12px 0 35px #0002}.drawerhead{display:flex;justify-content:space-between;align-items:center}.drawerhead h3{margin:0}.close{border:0;border-radius:7px;padding:6px 10px}.field{margin:13px 0}.field label{display:block;font-size:12px;color:#667085;margin-bottom:6px}.field input,.field textarea{width:100%;border:1px solid #d7dfeb;border-radius:8px;padding:9px}.field textarea{min-height:95px;resize:vertical}
+.loginOverlay{display:none;position:fixed;inset:0;background:#0f2f5d;z-index:100;place-items:center}.loginbox{width:380px;background:#fff;border-radius:16px;padding:32px;box-shadow:0 30px 80px #0004}.loginbox h2{margin-top:0}.loginbox p{font-size:13px;color:var(--muted);line-height:1.6}.loginbox .btn{width:100%;margin-top:8px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#172033;color:#fff;padding:10px 18px;border-radius:8px;opacity:0;transition:.2s;z-index:120}.toast.show{opacity:1}.viewnotice{background:#eff6ff;border:1px solid #cfe0ff;color:#315b94;padding:10px 13px;border-radius:9px;font-size:12px;margin-bottom:13px}
+.public-view .top{display:none}
+.public-view .layout{display:block;min-height:100vh}
+.public-view aside{display:none}
+.public-view .main{padding:0;height:100vh;background:#f7f9fc}
+.public-view .main>.head,.public-view .viewnotice{display:none}
+.public-view .panel{margin:0;padding:0;border:0;border-radius:0;height:100vh;background:transparent}
+.public-view .graph{height:100vh;border-radius:0;background-color:#f8fafc;background-image:radial-gradient(#dbe2ec 1px,transparent 1px);background-size:24px 24px}
+.public-view .stage{margin:0 auto;min-height:100vh}
+.public-view .node{box-shadow:0 10px 30px rgba(35,59,96,.10);border-color:#dfe6f0}
+.public-view .node.root{box-shadow:0 12px 32px rgba(32,95,189,.22)}
+.public-view .node.business{transition:.18s ease}
+.public-view .node.business:hover{transform:translateY(-4px);box-shadow:0 16px 38px rgba(35,59,96,.16)}
+.public-view .nodebody{padding:15px}
+.public-view .name{font-size:15px}
+.public-view .desc{font-size:12px}
+.public-admin-entry{display:none;position:fixed;right:18px;bottom:18px;z-index:40;width:34px;height:34px;border-radius:50%;border:1px solid #d9e1ec;background:#fff;color:#8490a3;opacity:.35;box-shadow:0 5px 15px #0001}
+.public-admin-entry:hover{opacity:1}
+.public-view .public-admin-entry{display:block}
+
+.admin-login-card{position:relative;overflow:hidden;width:410px;padding:38px 38px 30px;border:1px solid rgba(255,255,255,.45)}
+.admin-login-card:before{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:#eaf2ff;right:-80px;top:-85px}
+.login-mark{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#17477f,#2868b9);color:#fff;display:grid;place-items:center;font-size:20px;font-weight:800;box-shadow:0 8px 20px rgba(32,95,189,.22);margin-bottom:22px}
+.login-kicker{font-size:10px;letter-spacing:1.8px;color:#8b98aa;font-weight:700;margin-bottom:5px}
+.admin-login-card h2{font-size:25px;margin:0 0 8px;color:#172b4d}
+.admin-login-card p{margin:0 0 24px}
+.admin-login-card .field{margin:16px 0}
+.admin-login-card .field input{height:43px;background:#fbfcfe}
+.password-wrap{position:relative}.password-wrap input{padding-right:62px!important}.eye{position:absolute;right:6px;top:6px;height:31px;border:0;background:transparent;color:#5f6f85;font-size:12px}
+.login-main{height:44px!important;margin-top:8px!important;font-weight:700}.login-back{height:42px!important;margin-top:9px!important}.demo-hint{text-align:center;font-size:11px;color:#98a2b3;margin-top:16px}.login-error{display:none;background:#fff1f2;color:#b42318;border:1px solid #fecdd3;border-radius:7px;padding:8px 10px;font-size:12px;margin-bottom:8px}
+
+@media(max-width:900px){.layout{grid-template-columns:1fr}aside{display:none}.cards{grid-template-columns:1fr}}
+
+/* 悬浮业务板块时，将整个业务节点提升到管理平台之上。
+   tooltip 位于业务节点内部，因此必须同时提升父节点的层级。 */
+.node.business:hover{
+  z-index:2147483646 !important;
+}
+.node.business:hover .tip{
+  z-index:2147483647 !important;
+}
+
+
+/* 首屏加载：等待云端正式发布数据返回后再展示架构，避免内置历史数据闪现 */
+.public-loading{
+  position:fixed;inset:0;z-index:2147483647;
+  display:flex;align-items:center;justify-content:center;
+  background:#f8fafc;
+}
+.public-loading-box{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 18px;border:1px solid #e1e7ef;border-radius:12px;
+  background:#fff;color:#667085;font-size:13px;
+  box-shadow:0 10px 30px rgba(35,59,96,.08)
+}
+.public-loading-spinner{
+  width:18px;height:18px;border:2px solid #dbe4f0;
+  border-top-color:#205fbd;border-radius:50%;
+  animation:publicLoadingSpin .7s linear infinite
+}
+@keyframes publicLoadingSpin{to{transform:rotate(360deg)}}
+
+</style></head>
+<body>
+<div id="publicLoading" class="public-loading">
+  <div class="public-loading-box">
+    <span class="public-loading-spinner"></span>
+    <span id="publicLoadingText">正在加载业务架构…</span>
+  </div>
+</div>
+
+<div class="top"><div class="brand">实资办业务架构展示平台</div><div class="topright"><span class="status"><i class="dot"></i><span id="publishText">已发布</span></span><span id="identity">普通查看用户</span><button id="loginBtn" class="btn ghost" onclick="showLogin()">管理员登录</button><button id="logoutBtn" class="btn ghost" style="display:none" onclick="logout()">退出管理</button></div></div>
+<div class="layout"><aside><div class="menu active" onclick="showPage('architecture',this)">业务架构</div><div class="menu" onclick="showPage('overview',this)">架构概览</div><div class="menu adminOnly" style="display:none" onclick="showPage('manage',this)">编辑管理</div></aside><main class="main" id="main"></main></div>
+
+<div class="drawerbg" id="drawerbg" onclick="if(event.target===this)closeDrawer()"><div class="drawer"><div class="drawerhead"><h3>编辑业务板块</h3><button class="close" onclick="closeDrawer()">×</button></div><div id="drawerbody"></div></div></div>
+<div class="loginOverlay" id="loginOverlay">
+<div class="loginbox admin-login-card">
+  <div class="login-mark">实</div>
+  <div class="login-kicker">ADMIN CONSOLE</div>
+  <h2>管理员登录</h2>
+  <p>登录后可维护业务架构草稿，并在确认后统一发布。</p>
+  <div class="field"><label>管理员账号</label><input id="adminUser" value="" autocomplete="username" placeholder="请输入管理员邮箱"></div>
+  <div class="field"><label>密码</label><div class="password-wrap"><input id="adminPass" type="password" value="" autocomplete="current-password" placeholder="请输入密码"><button type="button" class="eye" onclick="togglePassword()">显示</button></div></div>
+  <div id="loginError" class="login-error"></div>
+  <button class="btn primary login-main" onclick="adminLogin()">进入管理后台</button>
+  <button class="btn ghost login-back" onclick="hideLogin()">返回业务架构</button>
+  <div class="demo-hint">使用 Supabase 管理员邮箱和密码登录</div>
+</div></div>
+<button class="public-admin-entry" onclick="showLogin()" title="管理员">⚙</button><div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://olgfqapbuddopwqlxdih.supabase.co";
+const SUPABASE_KEY="sb_publishable_A0mTRu4ebjehbFNBf8rWaA_Ji6wQ_iH";
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const PUB="office_v4lite_published",DRAFT="office_v4lite_draft";
+const initial={office:"资产管理与实验室办公室",businesses:[
+{id:1,name:"资产管理",duties:["固定资产登记与建账","设备采购管理","资产盘点","资产调拨与报废"],positions:["资产管理员","设备管理员"],platforms:["资产管理系统","设备共享平台"],x:100},
+{id:2,name:"实验室建设管理",duties:["实验室规划","建设项目管理","设备安装验收"],positions:["实验室建设管理员"],platforms:["实验室建设管理平台"],x:390},
+{id:3,name:"实验室安全管理",duties:["安全检查","危险源管理","安全教育培训","应急管理"],positions:["安全管理员"],platforms:["实验室安全管理系统"],x:680},
+{id:4,name:"大型仪器共享",duties:["大型仪器开放共享","预约使用管理","绩效统计"],positions:["仪器平台主管"],platforms:["大型仪器共享平台"],x:970}
+],publishedAt:"2026-09-21 16:00"};
+let admin=false,page="architecture",drag=null,selected=null;
+function hidePublicLoading(){
+ const el=document.getElementById("publicLoading");
+ if(el) el.style.display="none";
+}
+function clone(x){return JSON.parse(JSON.stringify(x))}function load(k,f){try{return JSON.parse(localStorage.getItem(k))||clone(f)}catch(e){return clone(f)}}
+let published=clone(initial),draft=clone(initial);
+async function loadCloudPublished(){
+  try{
+    const {data,error}=await sb.from("architecture_publications").select("content,published_at,version").order("version",{ascending:false}).limit(1);
+    if(error) throw error;
+    if(data&&data.length){
+      published=data[0].content;
+      published.publishedAt=new Date(data[0].published_at).toLocaleString();
+      if(!admin) draft=clone(published);
+    }
+    render();
+    hidePublicLoading();
+  }catch(e){
+    console.error(e);
+    render();
+    const txt=document.getElementById("publicLoadingText");
+    if(txt) txt.textContent="云端数据读取失败，正在显示备用数据…";
+    setTimeout(hidePublicLoading,900);
+    toast("云端数据读取失败");
+  }
+}
+async function loadCloudDraft(){
+  const {data,error}=await sb.from("architecture_drafts").select("id,content,updated_at").order("updated_at",{ascending:false}).limit(1);
+  if(error) throw error;
+  if(data&&data.length){draft=data[0].content;draft._draftId=data[0].id;}
+  else draft=clone(published);
+}
+async function saveDraft(){
+  const {data:{user}}=await sb.auth.getUser();
+  if(!user){toast("请先登录");return false;}
+  const payload=clone(draft); delete payload._draftId;
+  if(draft._draftId){
+    const {error}=await sb.from("architecture_drafts").update({content:payload,updated_at:new Date().toISOString(),updated_by:user.id}).eq("id",draft._draftId);
+    if(error){console.error(error);toast("草稿保存失败");return false;}
+  }else{
+    const {data,error}=await sb.from("architecture_drafts").insert({content:payload,updated_by:user.id}).select("id").single();
+    if(error){console.error(error);toast("草稿保存失败");return false;}
+    draft._draftId=data.id;
+  }
+  return true;
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function showPage(p,el){page=p;document.querySelectorAll(".menu").forEach(x=>x.classList.remove("active"));if(el)el.classList.add("active");render()}
+function current(){return admin?draft:published}
+function render(){let d=current();document.getElementById("publishText").textContent=admin?"草稿编辑中":"已发布";if(page==="architecture")renderGraph(d);else if(page==="overview")renderOverview(d);else renderManage()}
+function header(title,sub,buttons=""){return `<div class="head"><div><h2>${title}</h2><div class="sub">${sub}</div></div><div class="toolbar">${buttons}</div></div>`}
+function renderGraph(d){
+ let buttons=admin?`<button class="btn ghost" onclick="autoLayout()">自动布局</button><button class="btn primary" onclick="publish()">保存并发布</button>`:"";
+ document.getElementById("main").innerHTML=header("业务架构",admin?"当前为管理员草稿视图，可编辑后统一发布。":`当前展示已发布版本 · 发布时间：${esc(d.publishedAt||"-")}`,buttons)+(admin?"":`<div class="viewnotice">当前为只读查看模式。普通用户只能查看管理员已经发布的业务架构。</div>`)+`<div class="panel"><div class="graph" id="graph"><div class="stage"><svg id="edges"></svg><div id="nodes"></div></div></div></div>`;
+ let nodes=[{id:"root",type:"root",name:d.office,x:535,y:30,desc:"办公室业务架构"}];
+ d.businesses.forEach(b=>{nodes.push({id:"b"+b.id,type:"business",name:b.name,x:b.x,y:190,desc:b.duties.slice(0,2).join(" · "),ref:b});nodes.push({id:"s"+b.id,type:"platform",name:b.platforms.join(" / ")||"暂无平台",x:b.x,y:410,desc:"管理平台"})});
+ document.getElementById("nodes").innerHTML=nodes.map(n=>`<div class="node ${n.type} ${admin&&n.type==="business"?"editable":""}" data-id="${n.id}" style="left:${n.x}px;top:${n.y}px" ${admin&&n.type==="business"?`onmousedown="startDrag(event,${n.ref.id})" onclick="event.stopPropagation();editBusiness(${n.ref.id})"`:""}><div class="nodebody"><div class="type">${n.type==="root"?"办公室":n.type==="business"?"业务板块":"管理平台"}</div><div class="name">${esc(n.name)}</div><div class="desc">${esc(n.desc)}</div>${n.type==="business"?`<div class="position-inline"><span class="label">负责岗位</span>${n.ref.positions.length?n.ref.positions.map(x=>`<span class="position-chip">${esc(x)}</span>`).join(""):`<span class="position-chip">暂无</span>`}</div>`:""}</div>${n.type==="business"?`<div class="tip"><b>工作职责</b><br>${n.ref.duties.map(x=>"• "+esc(x)).join("<br>")||"暂无"}<br><br><b>负责岗位</b><br>${n.ref.positions.map(x=>"• "+esc(x)).join("<br>")||"暂无"}<br><br><b>管理平台</b><br>${n.ref.platforms.map(x=>"• "+esc(x)).join("<br>")||"暂无"}</div>`:""}</div>`).join("");
+ drawEdges(nodes);
+}
+function drawEdges(nodes){let root=nodes[0],paths="";current().businesses.forEach(b=>{let B=nodes.find(n=>n.id==="b"+b.id),S=nodes.find(n=>n.id==="s"+b.id);paths+=path(root,B,"")+path(B,S,"platform")});document.getElementById("edges").innerHTML=paths}
+function path(a,b,c){let x1=a.x+107,y1=a.y+82,x2=b.x+107,y2=b.y,mid=(y1+y2)/2;return `<path class="edge ${c}" d="M${x1},${y1} C${x1},${mid} ${x2},${mid} ${x2},${y2}"/>`}
+function renderOverview(d){let duties=d.businesses.reduce((s,b)=>s+b.duties.length,0),pos=d.businesses.reduce((s,b)=>s+b.positions.length,0),plats=d.businesses.reduce((s,b)=>s+b.platforms.length,0);document.getElementById("main").innerHTML=header("架构概览","已发布业务架构的数据概览")+`<div class="cards"><div class="card"><b>${d.businesses.length}</b><span>业务板块</span></div><div class="card"><b>${duties}</b><span>工作职责</span></div><div class="card"><b>${pos}</b><span>岗位</span></div></div><div class="cards" style="margin-top:14px"><div class="card"><b>${plats}</b><span>管理平台</span></div><div class="card"><b>${esc(d.publishedAt||"-")}</b><span>最近发布时间</span></div></div>`}
+function renderManage(){if(!admin){page="architecture";render();return}document.getElementById("main").innerHTML=header("编辑管理","管理员在此维护草稿，完成后统一发布",`<button class="btn primary" onclick="addBusiness()">＋ 新增业务</button><button class="btn primary" onclick="publish()">保存并发布</button>`)+`<div class="panel"><table style="width:100%;border-collapse:collapse"><tr style="text-align:left"><th style="padding:10px;border-bottom:1px solid #eee">业务板块</th><th>岗位</th><th>平台</th><th>操作</th></tr>${draft.businesses.map(b=>`<tr><td style="padding:11px;border-bottom:1px solid #eee"><b>${esc(b.name)}</b></td><td>${esc(b.positions.join("、"))}</td><td>${esc(b.platforms.join("、"))}</td><td><button class="btn ghost" onclick="editBusiness(${b.id})">编辑</button> <button class="btn danger" onclick="delBusiness(${b.id})">删除</button></td></tr>`).join("")}</table></div>`}
+function editBusiness(id){if(!admin)return;let b=draft.businesses.find(x=>x.id===id);document.getElementById("drawerbody").innerHTML=`<div class="field"><label>业务板块名称</label><input id="eName" value="${esc(b.name)}"></div><div class="field"><label>工作职责（每行一项）</label><textarea id="eDuties">${esc(b.duties.join("\n"))}</textarea></div><div class="field"><label>负责岗位（每行一个）</label><textarea id="ePositions">${esc(b.positions.join("\n"))}</textarea></div><div class="field"><label>管理平台（每行一个）</label><textarea id="ePlatforms">${esc(b.platforms.join("\n"))}</textarea></div><button class="btn primary" onclick="saveBusiness(${id})">保存到草稿</button>`;document.getElementById("drawerbg").style.display="block"}
+async function saveBusiness(id){let b=draft.businesses.find(x=>x.id===id);b.name=document.getElementById("eName").value.trim()||"未命名业务";b.duties=lines("eDuties");b.positions=lines("ePositions");b.platforms=lines("ePlatforms");await saveDraft();closeDrawer();render();toast("已保存到云端草稿，尚未发布")}
+function lines(id){return document.getElementById(id).value.split(/\n+/).map(x=>x.trim()).filter(Boolean)}
+async function addBusiness(){let id=Date.now();draft.businesses.push({id,name:"新增业务板块",duties:[],positions:[],platforms:[],x:100+draft.businesses.length*250});await saveDraft();editBusiness(id)}
+async function delBusiness(id){let b=draft.businesses.find(x=>x.id===id);if(confirm(`确定从草稿中删除“${b.name}”吗？`)){draft.businesses=draft.businesses.filter(x=>x.id!==id);await saveDraft();render();toast("已从云端草稿删除")}}
+async function publish(){
+  const {data:{user}}=await sb.auth.getUser();
+  if(!user){toast("请先登录");return;}
+  if(!await saveDraft()) return;
+  const {data:last,error:ve}=await sb.from("architecture_publications").select("version").order("version",{ascending:false}).limit(1);
+  if(ve){console.error(ve);toast("读取版本失败");return;}
+  const version=(last&&last.length?last[0].version:0)+1;
+  const payload=clone(draft); delete payload._draftId; payload.publishedAt=new Date().toLocaleString();
+  const {error}=await sb.from("architecture_publications").insert({version,content:payload,published_by:user.id});
+  if(error){console.error(error);toast("发布失败，请检查数据库权限");return;}
+  published=clone(payload);draft.publishedAt=payload.publishedAt;render();toast("发布成功，普通用户刷新后即可看到");
+}
+async function autoLayout(){draft.businesses.forEach((b,i)=>b.x=100+i*290);await saveDraft();render();toast("已自动布局")}
+function startDrag(e,id){let b=draft.businesses.find(x=>x.id===id),g=document.getElementById("graph").getBoundingClientRect();drag={id,dx:e.clientX-g.left+document.getElementById("graph").scrollLeft-b.x};e.preventDefault()}
+document.addEventListener("mousemove",e=>{if(!drag)return;let b=draft.businesses.find(x=>x.id===drag.id),g=document.getElementById("graph").getBoundingClientRect();b.x=Math.max(10,e.clientX-g.left+document.getElementById("graph").scrollLeft-drag.dx);let el=document.querySelector(`[data-id="b${b.id}"]`);if(el)el.style.left=b.x+"px"})
+document.addEventListener("mouseup",async()=>{if(drag){await saveDraft();drag=null;render()}})
+function togglePassword(){let p=document.getElementById("adminPass"),b=document.querySelector(".eye");p.type=p.type==="password"?"text":"password";b.textContent=p.type==="password"?"显示":"隐藏"}
+function showLogin(){let er=document.getElementById("loginError");if(er)er.style.display="none";document.getElementById("loginOverlay").style.display="grid";setTimeout(()=>document.getElementById("adminUser").focus(),50)}function hideLogin(){document.getElementById("loginOverlay").style.display="none"}
+async function adminLogin(){
+  const email=document.getElementById("adminUser").value.trim();
+  const password=document.getElementById("adminPass").value;
+  const er=document.getElementById("loginError");
+  if(!email||!password){er.textContent="请输入管理员邮箱和密码";er.style.display="block";return;}
+  const {error}=await sb.auth.signInWithPassword({email,password});
+  if(error){er.textContent="登录失败，请检查邮箱和密码";er.style.display="block";return;}
+  try{await loadCloudDraft();}catch(e){console.error(e);er.textContent="读取云端草稿失败";er.style.display="block";return;}
+  er.style.display="none";admin=true;document.body.classList.remove("public-view");hideLogin();
+  document.getElementById("identity").textContent="管理员";
+  document.getElementById("loginBtn").style.display="none";
+  document.getElementById("logoutBtn").style.display="inline-block";
+  document.querySelectorAll(".adminOnly").forEach(x=>x.style.display="block");
+  page="architecture";render();toast("已进入管理员模式");
+}
+async function logout(){await sb.auth.signOut();admin=false;document.body.classList.add("public-view");draft=clone(published);document.getElementById("identity").textContent="普通查看用户";document.getElementById("loginBtn").style.display="inline-block";document.getElementById("logoutBtn").style.display="none";document.querySelectorAll(".adminOnly").forEach(x=>x.style.display="none");page="architecture";document.querySelectorAll(".menu").forEach((x,i)=>x.classList.toggle("active",i===0));render()}
+function closeDrawer(){document.getElementById("drawerbg").style.display="none"}function toast(s){let t=document.getElementById("toast");t.textContent=s;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600)}
+document.body.classList.add("public-view");loadCloudPublished();
+</script></body></html>
